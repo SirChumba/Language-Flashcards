@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Flashcards App</title>
+    <style>
+      /* Reset & box sizing */
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        background: #1e1e1e;
+        color: white;
+        margin: 0;
+        padding: 1rem;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      h1,
+      h2 {
+        text-align: center;
+        margin: 1rem 0;
+        font-weight: 600;
+      }
+
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      h2 {
+        font-size: 1.4rem;
+        margin-bottom: 1rem;
+      }
+
+      /* Buttons */
+      button.menu-btn,
+      button.back-btn,
+      .controls button {
+        background-color: crimson;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        padding: 1rem;
+        font-size: 1.2rem;
+        font-weight: 600;
+        width: 100%;
+        max-width: 320px;
+        margin: 0.5rem 0;
+        transition: background-color 0.3s ease;
+        user-select: none;
+      }
+
+      button.menu-btn:hover,
+      button.back-btn:hover,
+      .controls button:hover {
+        background-color: #a30000;
+      }
+
+      /* Container for category buttons */
+      #categoryButtons {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        max-width: 320px;
+      }
+
+      /* Flashcard styling */
+      .flashcard {
+        width: 90vw;
+        max-width: 400px;
+        height: 280px;
+        background: transparent; /* remove card container bg */
+        border-radius: 14px;
+        cursor: pointer;
+        perspective: 1000px;
+        user-select: none;
+        position: relative;
+        margin-bottom: 2rem;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.8rem;
+        text-align: center;
+        padding: 1rem;
+      }
+
+      .card-inner {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 0.6s ease;
+        backface-visibility: hidden;
+      }
+
+      .card.flipped .card-inner {
+        transform: rotateY(180deg);
+      }
+
+      .card-front,
+      .card-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 1rem;
+        backface-visibility: hidden;
+        user-select: none;
+        word-break: break-word;
+      }
+
+      .card-front {
+        background-color: #444;
+      }
+
+      .card-back {
+        background-color: #555;
+        transform: rotateY(180deg);
+      }
+
+      /* Controls under flashcard */
+      .controls {
+        width: 100%;
+        max-width: 400px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .controls button {
+        width: 48%;
+        min-width: 120px;
+        font-size: 1rem;
+        padding: 0.8rem 0;
+      }
+
+      #progress {
+        color: #ccc;
+        font-weight: 600;
+        text-align: center;
+        width: 100%;
+        max-width: 100px;
+      }
+
+      /* Hide elements */
+      .hidden {
+        display: none !important;
+      }
+
+      /* Responsive text scaling */
+      @media (max-width: 400px) {
+        .flashcard {
+          height: 220px;
+          font-size: 1.4rem;
+        }
+
+        button.menu-btn,
+        button.back-btn,
+        .controls button {
+          font-size: 1.1rem;
+          max-width: 100%;
+          padding: 0.9rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1 id="title">Select a Flashcard Deck</h1>
+
+    <!-- LANGUAGE SELECT -->
+    <div id="languageScreen">
+      <button class="menu-btn" onclick="loadDeck('indonesian')">
+        🇮🇩 Indonesian
+      </button>
+      <!-- Add more languages here -->
+    </div>
+
+    <!-- CATEGORY SELECT -->
+    <div id="categoryScreen" class="hidden">
+      <h2 id="categoryTitle">Select Category</h2>
+      <div id="categoryButtons"></div>
+      <button class="back-btn" onclick="goToLanguageMenu()">
+        🔙 Back to Language
+      </button>
+    </div>
+
+    <!-- FLASHCARD SCREEN -->
+    <div id="flashcardScreen" class="hidden">
+      <div class="flashcard card" onclick="flipCard()">
+        <div class="card-inner" id="cardInner">
+          <div class="card-front" id="cardFront">Front</div>
+          <div class="card-back" id="cardBack">Back</div>
+        </div>
+      </div>
+      <div class="controls">
+        <button onclick="prevCard()">⟵ Prev</button>
+        <span id="progress">1 / 1</span>
+        <button onclick="nextCard()">Next ⟶</button>
+      </div>
+      <button class="back-btn" onclick="goToCategoryMenu()">
+        🔙 Back to Categories
+      </button>
+    </div>
+
+    <script>
+      var deck;
+      let cards = [];
+      let currentIndex = 0;
+      let flipped = false;
+
+      const title = document.getElementById("title");
+      const languageScreen = document.getElementById("languageScreen");
+      const categoryScreen = document.getElementById("categoryScreen");
+      const categoryButtons = document.getElementById("categoryButtons");
+      const flashcardScreen = document.getElementById("flashcardScreen");
+      const cardFront = document.getElementById("cardFront");
+      const cardBack = document.getElementById("cardBack");
+      const card = document.querySelector(".card");
+      const progress = document.getElementById("progress");
+      const categoryTitle = document.getElementById("categoryTitle");
+
+      function loadDeck(name) {
+        const oldScript = document.getElementById("deckScript");
+        if (oldScript) oldScript.remove();
+
+        const script = document.createElement("script");
+        script.src = `cards-${name}.js`;
+        script.id = "deckScript";
+        script.onload = () => {
+          if (!window.deck || !window.deck.categories) {
+            alert("Invalid deck file");
+            return;
+          }
+          deck = window.deck;
+          showCategories(deck);
+        };
+        script.onerror = () => alert("Failed to load deck file");
+        document.body.appendChild(script);
+      }
+
+      function showCategories(loadedDeck) {
+        if (!loadedDeck || !loadedDeck.categories) {
+          alert("Invalid deck file");
+          return;
+        }
+
+        languageScreen.classList.add("hidden");
+        categoryScreen.classList.remove("hidden");
+        categoryButtons.innerHTML = "";
+        title.textContent = `${loadedDeck.language} → English Flashcards`;
+        for (const cat in loadedDeck.categories) {
+          const btn = document.createElement("button");
+          btn.className = "menu-btn";
+          btn.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+          btn.onclick = () => startCategory(cat);
+          categoryButtons.appendChild(btn);
+        }
+      }
+
+      function startCategory(categoryName) {
+        cards = deck.categories[categoryName].slice();
+        if (!cards || cards.length === 0) {
+          alert("No cards in this category.");
+          return;
+        }
+
+        shuffleArray(cards);
+
+        currentIndex = 0;
+        flipped = false;
+        categoryScreen.classList.add("hidden");
+        flashcardScreen.classList.remove("hidden");
+        updateCard();
+        categoryTitle.textContent =
+          categoryName.charAt(0).toUpperCase() + categoryName.slice(1);
+      }
+
+      function updateCard() {
+        const current = cards[currentIndex];
+        cardFront.textContent = current.front;
+        cardBack.textContent = current.back;
+        progress.textContent = `${currentIndex + 1} / ${cards.length}`;
+
+        // Remove flipped class immediately
+        card.classList.remove("flipped");
+        flipped = false;
+
+        // Temporarily disable transition to prevent flicker
+        const cardInner = document.getElementById("cardInner");
+        cardInner.style.transition = "none";
+        void cardInner.offsetWidth; // reflow
+        cardInner.style.transition = "";
+      }
+
+      function flipCard() {
+        flipped = !flipped;
+        card.classList.toggle("flipped", flipped);
+      }
+
+      function nextCard() {
+        currentIndex = (currentIndex + 1) % cards.length;
+        updateCard();
+      }
+
+      function prevCard() {
+        currentIndex = (currentIndex - 1 + cards.length) % cards.length;
+        updateCard();
+      }
+
+      function goToLanguageMenu() {
+        categoryScreen.classList.add("hidden");
+        flashcardScreen.classList.add("hidden");
+        languageScreen.classList.remove("hidden");
+        title.textContent = "Select a Flashcard Deck";
+      }
+
+      function goToCategoryMenu() {
+        flashcardScreen.classList.add("hidden");
+        categoryScreen.classList.remove("hidden");
+      }
+
+      // Fisher-Yates shuffle for cards
+      function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+      }
+    </script>
+  </body>
+</html>
