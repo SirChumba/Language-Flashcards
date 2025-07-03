@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+    <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Flashcards App</title>
     <style>
-      /* Reset & box sizing */
+      /* Base Reset & Box Sizing */
       * {
         box-sizing: border-box;
       }
@@ -20,38 +21,40 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        font-size: 18px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
       }
 
       h1,
       h2 {
         text-align: center;
-        margin: 1rem 0;
+        margin: 1.5rem 0 1rem;
         font-weight: 600;
       }
 
       h1 {
-        font-size: 1.8rem;
+        font-size: 2.2rem;
       }
 
       h2 {
-        font-size: 1.4rem;
-        margin-bottom: 1rem;
+        font-size: 1.6rem;
       }
 
-      /* Buttons */
+      /* Buttons (menu + back + controls) */
       button.menu-btn,
       button.back-btn,
       .controls button {
         background-color: crimson;
         color: white;
         border: none;
-        border-radius: 8px;
+        border-radius: 10px;
         cursor: pointer;
-        padding: 1rem;
-        font-size: 1.2rem;
+        padding: 1.2rem;
+        font-size: 1.4rem;
         font-weight: 600;
         width: 100%;
-        max-width: 320px;
+        max-width: 340px;
         margin: 0.5rem 0;
         transition: background-color 0.3s ease;
         user-select: none;
@@ -63,21 +66,20 @@
         background-color: #a30000;
       }
 
-      /* Container for category buttons */
       #categoryButtons {
         display: flex;
         flex-direction: column;
         align-items: center;
         width: 100%;
-        max-width: 320px;
+        max-width: 340px;
       }
 
-      /* Flashcard styling */
+      /* Flashcard Container */
       .flashcard {
-        width: 90vw;
-        max-width: 400px;
-        height: 280px;
-        background: transparent; /* remove card container bg */
+        width: 92vw;
+        max-width: 420px;
+        height: 320px;
+        background: transparent;
         border-radius: 14px;
         cursor: pointer;
         perspective: 1000px;
@@ -88,7 +90,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        font-size: 1.8rem;
+        font-size: 2rem;
         text-align: center;
         padding: 1rem;
       }
@@ -115,25 +117,27 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 1rem;
+        padding: 1.5rem;
         backface-visibility: hidden;
         user-select: none;
         word-break: break-word;
+        font-size: 1.6rem;
+        line-height: 1.4;
       }
 
       .card-front {
-        background-color: #444;
+        background-color: #222;
       }
 
       .card-back {
-        background-color: #555;
+        background-color: #222;
         transform: rotateY(180deg);
       }
 
-      /* Controls under flashcard */
+      /* Controls below card */
       .controls {
         width: 100%;
-        max-width: 400px;
+        max-width: 420px;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -144,8 +148,8 @@
       .controls button {
         width: 48%;
         min-width: 120px;
-        font-size: 1rem;
-        padding: 0.8rem 0;
+        padding: 1rem;
+        font-size: 1.3rem;
       }
 
       #progress {
@@ -154,26 +158,44 @@
         text-align: center;
         width: 100%;
         max-width: 100px;
+        font-size: 1.2rem;
       }
 
-      /* Hide elements */
+      /* Utility */
       .hidden {
         display: none !important;
       }
 
-      /* Responsive text scaling */
-      @media (max-width: 400px) {
+      /* Responsive Tweaks */
+      @media (max-width: 500px) {
+        h1 {
+          font-size: 2rem;
+        }
+
+        h2 {
+          font-size: 1.5rem;
+        }
+
         .flashcard {
-          height: 220px;
-          font-size: 1.4rem;
+          height: 300px;
+          font-size: 1.8rem;
+        }
+
+        .card-front,
+        .card-back {
+          font-size: 1.5rem;
+          padding: 1.2rem;
         }
 
         button.menu-btn,
         button.back-btn,
         .controls button {
+          font-size: 1.3rem;
+          padding: 1rem;
+        }
+
+        #progress {
           font-size: 1.1rem;
-          max-width: 100%;
-          padding: 0.9rem;
         }
       }
     </style>
