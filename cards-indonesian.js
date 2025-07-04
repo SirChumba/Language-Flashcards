@@ -438,7 +438,7 @@ deck = {
       { front: "ingin", back: "to want (formal)" },
       { front: "perlu", back: "to need" },
       { front: "suka", back: "to like" },
-      { front: "saying", back: "to love (affectionate)" },
+      { front: "sayang", back: "to love (affectionate)" },
       { front: "cinta", back: "to love (romantic)" },
       { front: "tulis (menulis)", back: "to write" },
       { front: "baca (membaca)", back: "to read" },
